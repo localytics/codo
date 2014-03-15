@@ -11,6 +11,7 @@ module.exports = class Entities.Angular.Service extends require('./entity')
   constructor: (@environment, @file, @node) ->
     super
 
+    # Assume this service belongs to the most recently defined module
     @module = _.chain(@environment.entities).reverse().find((entity) -> entity instanceof Module).value()
     @basename  = @name
     @namespace = if @module then @module.name else @name
@@ -18,6 +19,8 @@ module.exports = class Entities.Angular.Service extends require('./entity')
     # [@name, @selfish] = @fetchName()
 
     @documentation = @node.documentation
+    @dependencies = []
+
     # @methods     = []
     # @variables   = []
     # @properties  = []
@@ -25,6 +28,15 @@ module.exports = class Entities.Angular.Service extends require('./entity')
     # @extends     = []
     # @concerns    = []
     # @descendants = []
+
+  linkify: ->
+    super
+    @linkifyDependencies()
+
+  linkifyDependencies: ->
+    for dependency in @dependencyNames
+      dep = @environment.find(Entities.Angular.Service, dependency) || dependency
+      @dependencies.push dep
 
   inspect: ->
     {

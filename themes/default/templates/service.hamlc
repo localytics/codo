@@ -23,6 +23,16 @@
           %td Defined in:
           %td= @entity.file.name
 
+        - if @entity.dependencies.length > 0
+          %tr
+            %td Dependencies:
+            %td
+              - for dep, i in @entity.dependencies
+                - if dep.name?
+                  %a{href: @pathFor('service', dep, @path)}= dep.name
+                - else
+                  = dep
+
         - if @entity.parent
           %tr
             %td Inherits:

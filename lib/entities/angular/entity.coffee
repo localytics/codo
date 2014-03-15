@@ -13,7 +13,7 @@ module.exports = class AngularEntity extends require('../../entity')
     # debugger
     # [@name, @selfish] = @fetchName()
 
-    @dependencies = _.map node.args?[1]?.base?.objects?[2]?.params or [], (param) -> param.name.value
+    @dependencyNames = _.map node.args?[1]?.base?.objects?[2]?.params or [], (param) -> param.name.value
     @documentation = @node.documentation
     # @methods     = []
     # @variables   = []
