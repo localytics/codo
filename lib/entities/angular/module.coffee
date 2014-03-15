@@ -10,7 +10,6 @@ module.exports = class Entities.Angular.Module extends require('./entity')
 
   constructor: (@environment, @file, @node) ->
     super
-    debugger
 
     @basename  = @name
     @namespace = @name

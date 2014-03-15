@@ -33,17 +33,16 @@
                 - else
                   = dep
 
-        - if @entity.parent
-          %tr
-            %td Inherits:
-            %td
-              - if @entity.parent.name?
-                %a{href: @pathFor('class', @entity.parent, @path)}= @entity.parent.name
-              - else
-                = @entity.parent
 
       - if @entity.documentation?
         %h2 Overview
         != @render 'partials/documentation', documentation: @entity.documentation, kind: 'class'
+
+      - if @entity.classes.length > 0
+        %h2 Class Summary
+
+        %p
+          - for klass in @entity.classes
+            %a{href: @pathFor('class', klass, @path)}= klass.name
 
     != @render 'layout/footer'

@@ -1,7 +1,12 @@
+Class     = require '../class'
+Method     = require '../method'
+Variable   = require '../variable'
+Property   = require '../property'
+Mixin      = require '../mixin'
 Entities = require '../../_entities'
 Entities.Angular   = require '../_angular'
 Module = require './module'
-_             = require 'underscore'
+_ = require 'underscore'
 
 module.exports = class Entities.Angular.Service extends require('./entity')
 
@@ -20,7 +25,7 @@ module.exports = class Entities.Angular.Service extends require('./entity')
 
     @documentation = @node.documentation
     @dependencies = []
-
+    @classes = []
     # @methods     = []
     # @variables   = []
     # @properties  = []
@@ -32,6 +37,12 @@ module.exports = class Entities.Angular.Service extends require('./entity')
   linkify: ->
     super
     @linkifyDependencies()
+
+    for node in @node.args[1].base.objects[2].body.expressions when node.entities
+      for entity in node.entities
+        switch
+          when entity instanceof Class
+            @classes.push entity
 
   linkifyDependencies: ->
     for dependency in @dependencyNames
