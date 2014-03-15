@@ -1,4 +1,8 @@
 %nav
+  - if @environment.allServices().length > 0
+    %a{target: '_self', href: 'service_list.html'}
+      Services
+
   - if @environment.allClasses().length > 0
     %a{target: '_self', href: 'class_list.html'}
       Classes

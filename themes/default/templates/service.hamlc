@@ -1,0 +1,39 @@
+!!!
+%html
+  != @render 'layout/header'
+  %body
+    != @render 'layout/intro', breadcrumbs: @breadcrumbs
+
+    #content
+      %h1
+        Service:
+        = @entity.name
+
+        - if @entity.documentation?.abstract?
+          %span.note.title Abstract
+
+        - if @entity.documentation?.deprecated?
+          %span.deprecated.note.title Deprecated
+
+        - if @entity.documentation?.private?
+          %span.private.note.title Private
+
+      %table.box
+        %tr
+          %td Defined in:
+          %td= @entity.file.name
+
+        - if @entity.parent
+          %tr
+            %td Inherits:
+            %td
+              - if @entity.parent.name?
+                %a{href: @pathFor('class', @entity.parent, @path)}= @entity.parent.name
+              - else
+                = @entity.parent
+
+      - if @entity.documentation?
+        %h2 Overview
+        != @render 'partials/documentation', documentation: @entity.documentation, kind: 'class'
+
+    != @render 'layout/footer'

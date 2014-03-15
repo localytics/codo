@@ -9,6 +9,9 @@ Variable  = require './entities/variable'
 Property  = require './entities/property'
 Mixin     = require './entities/mixin'
 Extra     = require './entities/extra'
+Angular =
+  Service: require './entities/angular/service'
+  Module: require './entities/angular/module'
 walkdir   = require 'walkdir'
 Winston   = require 'winston'
 
@@ -41,6 +44,8 @@ module.exports = class Environment
     @references = {}
     @parsed     = {}
 
+    @needles.push Angular.Module
+    @needles.push Angular.Service
     @needles.push Class
     @needles.push Method
     @needles.push Variable
@@ -83,6 +88,7 @@ module.exports = class Environment
   allClasses: -> @_allClasses ||= @all(Class)
   allMixins:  -> @_allMixins  ||= @all(Mixin)
   allExtras:  -> @_allExtras  ||= @all(Extra)
+  allServices: -> @_allServices ||= @all(Angular.Service)
   allMethods: ->
     return @_allMethods if @_allMethods?
 
