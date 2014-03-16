@@ -131,6 +131,7 @@ module.exports = class Theme.Theme
   # Generate the alphabetical index of all classes and mixins.
   #
   renderAlphabeticalIndex: ->
+    services = {}
     classes = {}
     mixins  = {}
     files   = {}
@@ -139,6 +140,7 @@ module.exports = class Theme.Theme
     for code in [97..122]
       char = String.fromCharCode(code)
       map  = [
+        [@environment.allServices(), services],
         [@environment.allClasses(), classes],
         [@environment.allMixins(), mixins],
         [@environment.allFiles(), files]
@@ -151,12 +153,15 @@ module.exports = class Theme.Theme
             storage[char].push(entry) 
 
     @render 'alphabetical_index', 'alphabetical_index.html',
+      services: services
       classes: classes
       mixins:  mixins
       files:   files
 
   renderIndex: ->
-    list = if @environment.allClasses().length > 0
+    list = if @environment.allServices().length > 0
+        'service_list.html'
+      else if @environment.allClasses().length > 0
         'class_list.html'
       else if @environment.allFiles().length > 0
         'file_list.html'

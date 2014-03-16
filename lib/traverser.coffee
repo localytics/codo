@@ -139,6 +139,8 @@ module.exports = class Traverser
 
       if lastEntityOrComment?.comment?
         node.documentation = new Documentation(@leftTrimBlock lastEntityOrComment.comment)
+        # Delete comments so they don't get assigned more than once
+        delete lastEntityOrComment.comment
 
     if Entity.is(node)
       entity = new Entity @environment, file, node
