@@ -19,6 +19,9 @@ module.exports = Codo =
     Property:  require './entities/property'
     Mixin:     require './entities/mixin'
     Extra:     require './entities/extra'
+    Angular:
+      Service:   require './entities/angular/service'
+      Module:   require './entities/angular/module'
 
   Meta:
     Method:    require './meta/method'

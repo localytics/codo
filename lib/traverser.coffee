@@ -66,7 +66,8 @@ module.exports = class Traverser
         inBlockComment = !inBlockComment if blockComment
         result.push line
       else
-        commentLine = /^(\s*#)\s?(\s*.*)/.exec(line)
+        # Ignore Sprockets directives
+        commentLine = /^(\s*#(?!=))\s?(\s*.*)/.exec(line)
         if commentLine
           if inComment
             comment.push @whitespace(indentComment) + commentLine[2]?.replace /#/g, "\u0091#"
@@ -95,6 +96,8 @@ module.exports = class Traverser
                    ^\s*@[$A-Z_][A-Z_]*)
                  | # Properties
                    ^\s*[$A-Za-z_\x7f-\uffff][$\w\x7f-\uffff]*:
+                 | # Angular thingies
+                   \.(module|factory|directive|controller|filter|provider)
                ///.exec line
 
               result.push c for c in comment
@@ -132,22 +135,15 @@ module.exports = class Traverser
     node.entities ?= []
 
     unless node.documentation?
-      # Find actual comment node
-      previous = @history[@history.length-1]
 
-      switch previous?.constructor.name
-        # A comment is preveding the entity declaration
-        when 'Comment'
-          doc = previous
+      lastEntityOrComment = _.chain(@history).slice().reverse().find (node) ->
+        node.entity or node.constructor.name is 'Comment'
+      .value()
 
-        when 'Literal'
-          # The node is exported `module.exports = ...`, take the comment before `module`
-          if previous.value is 'exports'
-            previous = @history[@history.length-6]
-            doc = previous if previous?.constructor.name is 'Comment'
-
-      if doc?.comment?
-        node.documentation = new Documentation(@leftTrimBlock doc.comment)
+      if lastEntityOrComment?.comment?
+        node.documentation = new Documentation(@leftTrimBlock lastEntityOrComment.comment)
+        # Delete comments so they don't get assigned more than once
+        delete lastEntityOrComment.comment
 
     if Entity.is(node)
       entity = new Entity @environment, file, node

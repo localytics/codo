@@ -30,6 +30,7 @@ module.exports = class Theme.Theme
     @renderAlphabeticalIndex()
     @render 'method_list', 'method_list.html'
 
+    @renderServices()
     @renderClasses()
     @renderMixins()
     @renderFiles()
@@ -57,6 +58,8 @@ module.exports = class Theme.Theme
   pathFor: (kind, entity, prefix='') ->
     unless entity?
       entity = kind
+      kind = 'service' if entity instanceof Codo.Entities.Angular.Service
+      kind = 'module' if entity instanceof Codo.Entities.Angular.Module
       kind = 'class'  if entity instanceof Codo.Entities.Class
       kind = 'mixin'  if entity instanceof Codo.Entities.Mixin
       kind = 'file'   if entity instanceof Codo.Entities.File
@@ -68,7 +71,7 @@ module.exports = class Theme.Theme
     switch kind
       when 'file', 'extra'
         prefix + kind + '/' + entity.name + '.html'
-      when 'class', 'mixin'
+      when 'class', 'mixin', 'service'
         prefix + kind + '/' + entity.name.replace(/\./, '/') + '.html'
       when 'method', 'variable'
         @pathFor(entity.owner, undefined, prefix) + '#' + @anchorFor(entity.entity)
@@ -128,6 +131,7 @@ module.exports = class Theme.Theme
   # Generate the alphabetical index of all classes and mixins.
   #
   renderAlphabeticalIndex: ->
+    services = {}
     classes = {}
     mixins  = {}
     files   = {}
@@ -136,6 +140,7 @@ module.exports = class Theme.Theme
     for code in [97..122]
       char = String.fromCharCode(code)
       map  = [
+        [@environment.allServices(), services],
         [@environment.allClasses(), classes],
         [@environment.allMixins(), mixins],
         [@environment.allFiles(), files]
@@ -148,12 +153,15 @@ module.exports = class Theme.Theme
             storage[char].push(entry) 
 
     @render 'alphabetical_index', 'alphabetical_index.html',
+      services: services
       classes: classes
       mixins:  mixins
       files:   files
 
   renderIndex: ->
-    list = if @environment.allClasses().length > 0
+    list = if @environment.allServices().length > 0
+        'service_list.html'
+      else if @environment.allClasses().length > 0
         'class_list.html'
       else if @environment.allFiles().length > 0
         'file_list.html'
@@ -172,6 +180,16 @@ module.exports = class Theme.Theme
     @render 'frames', 'index.html',
       list: list
       main: main
+
+  renderServices: ->
+    @render 'service_list', 'service_list.html',
+      tree: TreeBuilder.build @environment.allServices(), (klass) ->
+        [klass.basename, klass.namespace.split('.')]
+
+    for klass in @environment.allServices()
+      @render 'service', @pathFor('service', klass),
+        entity: klass,
+        breadcrumbs: @generateBreadcrumbs(klass.name.split '.')
 
   renderClasses: ->
     @render 'class_list', 'class_list.html',
@@ -217,6 +235,7 @@ module.exports = class Theme.Theme
   renderFuzzySearchData: ->
     search = []
     everything = [
+      @environment.allServices(),
       @environment.allClasses(),
       @environment.allMixins(),
       @environment.allFiles(),

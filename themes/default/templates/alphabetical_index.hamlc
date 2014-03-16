@@ -36,6 +36,20 @@
                         %small
                           = surround '(', ')', -> klass.namespace
 
+        - if @environment.allServices().length > 0
+          %h2 Service Listing A-Z
+
+          .index
+            - for char, services of @services
+              %ul
+                %li.letter= char
+                %ul
+                  - for klass in services
+                    %li
+                      %a{href: @pathFor('service', klass, @path)}
+                        = klass.name
+
+
         - if @environment.allMixins().length > 0
           %h2 Mixins Listing A-Z
 
