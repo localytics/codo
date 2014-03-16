@@ -16,8 +16,14 @@ module.exports = class Entities.Angular.Service extends require('./entity')
   constructor: (@environment, @file, @node) ->
     super
 
-    # Assume this service belongs to the most recently defined module
-    @module = _.chain(@environment.entities).reverse().find((entity) -> entity instanceof Module).value()
+    # debugger if @name is 'Region'
+    # Try to find the module definition on the same line or the last one in history
+    @module = if @node.variable?.base?.variable?.base?.value is 'angular' and
+      @node.variable.base.variable.properties?[0]?.name?.value is 'module'
+        new Module(@environment, @file, @node.variable.base)
+      else
+        _.chain(@environment.entities).slice().reverse().find((entity) -> entity instanceof Module).value()
+
     @basename  = @name
     @namespace = if @module then @module.name else @name
     # debugger

@@ -134,7 +134,7 @@ module.exports = class Traverser
 
     unless node.documentation?
 
-      lastEntityOrComment = _.chain(@history).reverse().find (node) ->
+      lastEntityOrComment = _.chain(@history).slice().reverse().find (node) ->
         node.entity or node.constructor.name is 'Comment'
       .value()
 
