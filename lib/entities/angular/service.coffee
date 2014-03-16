@@ -38,7 +38,7 @@ module.exports = class Entities.Angular.Service extends require('./entity')
     super
     @linkifyDependencies()
 
-    expressions = _.last(@node.args[1].base.objects)?.body?.expressions or []
+    expressions = _.last(@node.args?[1]?.base?.objects or [])?.body?.expressions or []
 
     for node in expressions when node.entities
       for entity in node.entities
