@@ -3,7 +3,7 @@
   != @render 'layout/header'
   %body.list
     #content.tree.list
-      %h1.full_list_header Service List
+      %h1.full_list_header =@title
 
       != @render 'partials/list_nav'
 
@@ -16,7 +16,7 @@
           - for entry in tree
             %li
               - if entry.entity
-                %a{href: @pathFor('service', entry.entity, @path), target: 'main'}
+                %a{href: @pathFor(@type, entry.entity, @path), target: 'main'}
                   = entry.entity.basename
                 - if entry.entity.parent
                   %small.parent

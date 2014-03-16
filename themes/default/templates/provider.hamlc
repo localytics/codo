@@ -6,7 +6,8 @@
 
     #content
       %h1
-        Service:
+        = @entity.constructor.name
+        :
         = @entity.name
 
         - if @entity.documentation?.abstract?

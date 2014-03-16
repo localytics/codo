@@ -31,6 +31,8 @@ module.exports = class Theme.Theme
     @render 'method_list', 'method_list.html'
 
     @renderServices()
+    @renderDirectives()
+    @renderFilters()
     @renderClasses()
     @renderMixins()
     @renderFiles()
@@ -58,6 +60,8 @@ module.exports = class Theme.Theme
   pathFor: (kind, entity, prefix='') ->
     unless entity?
       entity = kind
+      kind = 'directive' if entity instanceof Codo.Entities.Angular.Directive
+      kind = 'filter' if entity instanceof Codo.Entities.Angular.Filter
       kind = 'service' if entity instanceof Codo.Entities.Angular.Service
       kind = 'module' if entity instanceof Codo.Entities.Angular.Module
       kind = 'class'  if entity instanceof Codo.Entities.Class
@@ -71,7 +75,7 @@ module.exports = class Theme.Theme
     switch kind
       when 'file', 'extra'
         prefix + kind + '/' + entity.name + '.html'
-      when 'class', 'mixin', 'service'
+      when 'class', 'mixin', 'service', 'directive', 'filter'
         prefix + kind + '/' + entity.name.replace(/\./, '/') + '.html'
       when 'method', 'variable'
         @pathFor(entity.owner, undefined, prefix) + '#' + @anchorFor(entity.entity)
@@ -132,6 +136,8 @@ module.exports = class Theme.Theme
   #
   renderAlphabeticalIndex: ->
     services = {}
+    directives = {}
+    filters = {}
     classes = {}
     mixins  = {}
     files   = {}
@@ -141,6 +147,8 @@ module.exports = class Theme.Theme
       char = String.fromCharCode(code)
       map  = [
         [@environment.allServices(), services],
+        [@environment.allFilters(), filters],
+        [@environment.allDirectives(), directives],
         [@environment.allClasses(), classes],
         [@environment.allMixins(), mixins],
         [@environment.allFiles(), files]
@@ -153,6 +161,8 @@ module.exports = class Theme.Theme
             storage[char].push(entry) 
 
     @render 'alphabetical_index', 'alphabetical_index.html',
+      directives: directives
+      filters: filters
       services: services
       classes: classes
       mixins:  mixins
@@ -182,12 +192,38 @@ module.exports = class Theme.Theme
       main: main
 
   renderServices: ->
-    @render 'service_list', 'service_list.html',
+    @render 'provider_list', 'service_list.html',
       tree: TreeBuilder.build @environment.allServices(), (klass) ->
         [klass.basename, klass.namespace.split('.')]
+      title: 'Service List'
+      type: 'service'
 
     for klass in @environment.allServices()
-      @render 'service', @pathFor('service', klass),
+      @render 'provider', @pathFor('service', klass),
+        entity: klass,
+        breadcrumbs: @generateBreadcrumbs(klass.name.split '.')
+
+  renderDirectives: ->
+    @render 'provider_list', 'directive_list.html',
+      tree: TreeBuilder.build @environment.allDirectives(), (klass) ->
+        [klass.basename, klass.namespace.split('.')]
+      title: 'Directive List'
+      type: 'directive'
+
+    for klass in @environment.allDirectives()
+      @render 'provider', @pathFor('directive', klass),
+        entity: klass,
+        breadcrumbs: @generateBreadcrumbs(klass.name.split '.')
+
+  renderFilters: ->
+    @render 'provider_list', 'filter_list.html',
+      tree: TreeBuilder.build @environment.allFilters(), (klass) ->
+        [klass.basename, klass.namespace.split('.')]
+      title: 'Filter List'
+      type: 'filter'
+
+    for klass in @environment.allFilters()
+      @render 'provider', @pathFor('filter', klass),
         entity: klass,
         breadcrumbs: @generateBreadcrumbs(klass.name.split '.')
 

@@ -3,6 +3,14 @@
     %a{target: '_self', href: 'service_list.html'}
       Services
 
+  - if @environment.allDirectives().length > 0
+    %a{target: '_self', href: 'directive_list.html'}
+      Directives
+
+  - if @environment.allFilters().length > 0
+    %a{target: '_self', href: 'filter_list.html'}
+      Filters
+
   - if @environment.allClasses().length > 0
     %a{target: '_self', href: 'class_list.html'}
       Classes

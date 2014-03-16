@@ -22,6 +22,9 @@ module.exports = Codo =
     Angular:
       Service:   require './entities/angular/service'
       Module:   require './entities/angular/module'
+      Filter: require './entities/angular/filter'
+      Directive: require './entities/angular/directive'
+
 
   Meta:
     Method:    require './meta/method'

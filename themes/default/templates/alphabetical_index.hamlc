@@ -49,6 +49,31 @@
                       %a{href: @pathFor('service', klass, @path)}
                         = klass.name
 
+        - if @environment.allDirectives().length > 0
+          %h2 Directive Listing A-Z
+
+          .index
+            - for char, directives of @directives
+              %ul
+                %li.letter= char
+                %ul
+                  - for klass in directives
+                    %li
+                      %a{href: @pathFor('directive', klass, @path)}
+                        = klass.name
+
+        - if @environment.allFilters().length > 0
+          %h2 Filter Listing A-Z
+
+          .index
+            - for char, filters of @filters
+              %ul
+                %li.letter= char
+                %ul
+                  - for klass in filters
+                    %li
+                      %a{href: @pathFor('filter', klass, @path)}
+                        = klass.name
 
         - if @environment.allMixins().length > 0
           %h2 Mixins Listing A-Z

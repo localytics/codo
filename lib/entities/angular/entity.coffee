@@ -3,8 +3,10 @@ _             = require 'underscore'
 module.exports = class AngularEntity extends require('../../entity')
 
   @looksLike: (node, type) ->
-    node.constructor.name == 'Call' && node.variable?.properties?[0]?.name?.value == type
-
+    if node.constructor.name == 'Call' and value = node.variable?.properties?[0]?.name?.value
+      value is type or _.isArray(type) and value in type
+    else false
+    
   constructor: (@environment, @file, @node) ->
     @name = node.args[0].base.value.replace(/'/g, '')
 
