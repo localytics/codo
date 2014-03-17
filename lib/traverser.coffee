@@ -24,7 +24,7 @@ module.exports = class Traverser
 
   @read: (file, environment) ->
     content = FS.readFileSync(file, 'utf8')
-    #content = @convertComments(content, environment.options.closure) unless environment.options.cautios
+    content = @convertComments(content, environment.options.closure) unless environment.options.cautios
 
     new @(file, content, environment)
 
