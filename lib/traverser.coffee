@@ -24,7 +24,7 @@ module.exports = class Traverser
 
   @read: (file, environment) ->
     content = FS.readFileSync(file, 'utf8')
-    content = @convertComments(content, environment.options.closure) unless environment.options.cautios
+    #content = @convertComments(content, environment.options.closure) unless environment.options.cautios
 
     new @(file, content, environment)
 
@@ -82,23 +82,28 @@ module.exports = class Traverser
             inComment = false
             comment.push @whitespace(indentComment) + '###'
 
-            # Push here comments only before certain lines
-            if ///
-                 ( # Class
-                   class\s*@?[$A-Za-z_\x7f-\uffff][$\w\x7f-\uffff]*
-                 | # Mixin or assignment
-                   ^\s*[$A-Za-z_\x7f-\uffff][$\w\x7f-\uffff.]*\s+\=
-                 | # Function
-                   [$A-Za-z_\x7f-\uffff][$\w\x7f-\uffff]*\s*:\s*(\(.*\)\s*)?[-=]>
-                 | # Function
-                   @[A-Za-z_\x7f-\uffff][$\w\x7f-\uffff]*\s*=\s*(\(.*\)\s*)?[-=]>
-                 | # Constant
-                   ^\s*@[$A-Z_][A-Z_]*)
-                 | # Properties
-                   ^\s*[$A-Za-z_\x7f-\uffff][$\w\x7f-\uffff]*:
-                 | # Angular thingies
-                   \.(module|factory|directive|controller|filter|provider)
-               ///.exec line
+            # Only ignore comments when the following line is blank or its indentation is less than
+            # that of the comment
+            nextLine = /^(\s*)(\S+)/.exec(line)
+            if nextLine and nextLine[1].length >= indentComment
+
+            # # Push here comments only before certain lines
+            # if ///
+            #      ( # Class
+            #        class\s*@?[$A-Za-z_\x7f-\uffff][$\w\x7f-\uffff]*
+            #      | # Mixin or assignment
+            #        ^\s*[$A-Za-z_\x7f-\uffff][$\w\x7f-\uffff.]*\s+\=
+            #      | # Function
+            #        [$A-Za-z_\x7f-\uffff][$\w\x7f-\uffff]*\s*:\s*(\(.*\)\s*)?[-=]>
+            #      | # Function
+            #        @[A-Za-z_\x7f-\uffff][$\w\x7f-\uffff]*\s*=\s*(\(.*\)\s*)?[-=]>
+            #      | # Constant
+            #        ^\s*@[$A-Z_][A-Z_]*)
+            #      | # Properties
+            #        ^\s*[$A-Za-z_\x7f-\uffff][$\w\x7f-\uffff]*:
+            #      | # Angular thingies
+            #        \.(module|factory|directive|controller|filter|provider)
+            #    ///.exec line
 
               result.push c for c in comment
 
@@ -130,6 +135,7 @@ module.exports = class Traverser
         @prepare(node, @file, Entity)
 
       @history.push node
+      # console.log node.comment if node.comment
 
   prepare: (node, file, Entity) ->
     node.entities ?= []
@@ -149,7 +155,6 @@ module.exports = class Traverser
       entity = new Entity @environment, file, node
       node.entities.push(entity)
       @environment.registerEntity(entity)
-
       entity
 
   # Detect whitespace on the left and removes

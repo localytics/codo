@@ -29,6 +29,11 @@ module.exports = class Entities.Angular.Provider extends require('./entity')
     # debugger
     # [@name, @selfish] = @fetchName()
 
+    # Grab dependency names from DI array syntax
+    @dependencyNames = []
+    if objects = node.args?[1]?.base?.objects?[..-2]
+      @dependencyNames = _.map objects, (o) -> o.base?.value?.replace(/'/g, '')
+
     @documentation = @node.documentation
     @dependencies = []
     @classes = []
